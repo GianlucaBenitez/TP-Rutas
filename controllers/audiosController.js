@@ -1,29 +1,31 @@
 const promiseQuery = require('../config/db.js');
 
-// Controlador de usuarios
+// Importamos modelo de Audio
+const Audio = require('../models/Audio.js');
+
+// Controlador de audios
 const obtenerTodos = async (req, res) => {
-    try {
-        const query = "SELECT nombre_audio, tipo_meditacion FROM audios";
-    
-        const audios = await promiseQuery(query)
-        
-        res.json(audios);
-      } catch (error) {
-        throw err
-      }
+  try {
+    const audios = await Audio.findAll()
+    return res.status(200).json({message: audios}) 
+  } catch (error) {
+    return res.status(500).json({error: "Internal Server Error"})
+  }
 }
 
 const obtenerPorTipo = async (req, res) => {
-    try {
-        const tipo = req.params.tipo
-        const query = "SELECT nombre_audio, tipo_meditacion FROM audios where tipo_meditacion = ?";
-    
-        const audios = await promiseQuery(query, [tipo])
-        
-        res.json(audios);
-      } catch (error) {
-        throw err
+  try {
+      const tipo = req.params.tipo
+      const audios = await Audio.findAll({ where: { tipo_meditacion: tipo } });
+
+      if(audios.length === 0){
+        return res.status(404).json({error: "El tipo de meditación buscado no existe"})
       }
+      
+      return res.status(200).json({message: audios}) 
+  }catch (error) {
+    return res.status(500).json({error: "Internal Server Error"})
+  }
 }
 
 module.exports = {

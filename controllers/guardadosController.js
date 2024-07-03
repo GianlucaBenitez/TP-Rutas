@@ -1,17 +1,20 @@
-const promiseQuery = require('../config/db.js');
+// Importamos modelo de Guardado
+const Guardado = require('../models/Guardados.js');
 
-// Controlador de usuarios
+// Controlador de guardados
 const obtener = async (req, res) => {
     try {
-        const id = req.params.id ;
-        const query = "SELECT * FROM guardados where id_usuario = ?";
-    
-        const guardados = await promiseQuery(query, [id])
-        
-        res.json(guardados);
-      } catch (error) {
-        throw err
+      const id = req.params.id ;
+      const guardados = await Guardado.findByPk(id)
+
+      if (!guardados) {
+        return res.status(404).json({ error: "Guardado no encontrado" });
       }
+        
+      return res.status(200).json({message: guardados}) 
+    } catch (error) {
+      return res.status(500).json({error: "Internal Server Error"})
+    }
 }
 
 module.exports = {
